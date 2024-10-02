@@ -2,6 +2,7 @@ const express = require('express'); // framework minimaliste pour créer des app
 const bodyParser = require('body-parser'); // body-parser : middleware pour parser le corps des requêtes entrantes en JSON
 const mongoose = require('mongoose'); // outil de gestion des documents MongoDB via des modèles
 const stuffRoutes = require('./routes/stuff');// importe le module (les routes pour stuff)
+const userRoutes = require('./routes/user'); // importe le module (les routes pour user)
  
 
 // Connexion à la base de données MongoDB hébergée via MongoDB Atlas
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 
 // indique à l'application Express d'utiliser ces routes à partir de l'URL /api/stuff
-app.use('/api/stuff', stuffRoutes); 
+app.use('/api/stuff', stuffRoutes);
+app.use('/api/auth', userRoutes); 
 
 module.exports = app;
