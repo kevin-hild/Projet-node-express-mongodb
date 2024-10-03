@@ -1,20 +1,21 @@
 // Importation du modèle "Thing" qui représente un objet dans la base de données
 const Thing = require('../models/Thing');
+const fs = require('fs');
 
 // Création d’un nouvel objet
 exports.createThing = (req, res, next) => {
-    // Suppression de l'ID envoyé dans la requête (l'ID sera généré automatiquement par la base de données)
-    delete req.body._id;
+  const thingObject = JSON.parse(req.body.thing);
+  delete thingObject._id;
+  delete thingObject._userId;
+  const thing = new Thing({
+      ...thingObject,
+      userId: req.auth.userId,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+  });
 
-    // Création d'une nouvelle instance du modèle "Thing" avec les données de la requête
-    const thing = new Thing({
-      ...req.body // Copie toutes les propriétés du corps de la requête dans l'objet thing
-    });
-
-    // Sauvegarde de l'objet dans la base de données
-    thing.save()
-      .then(() => res.status(201).json({ message: 'Objet enregistré !' })) // Succès : objet créé
-      .catch(error => res.status(400).json({ error })); // Erreur : mauvaise requête
+  thing.save()
+  .then(() => { res.status(201).json({message: 'Objet enregistré !'})})
+  .catch(error => { res.status(400).json( { error })})
 };
 
 // Récupération de tous les objets
@@ -35,16 +36,43 @@ exports.getOneThing = (req, res, next) => {
 
 // Mise à jour d’un objet existant
 exports.modifyThing = (req, res, next) => {
-    // Mise à jour de l'objet identifié par son ID avec les nouvelles données envoyées dans la requête
-    Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Objet modifié !' })) // Succès : objet mis à jour
-      .catch(error => res.status(400).json({ error })); // Erreur : mauvaise requête
+  const thingObject = req.file ? {
+      ...JSON.parse(req.body.thing),
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+  } : { ...req.body };
+
+  delete thingObject._userId;
+  Thing.findOne({_id: req.params.id})
+      .then((thing) => {
+          if (thing.userId != req.auth.userId) {
+              res.status(401).json({ message : 'Not authorized'});
+          } else {
+              Thing.updateOne({ _id: req.params.id}, { ...thingObject, _id: req.params.id})
+              .then(() => res.status(200).json({message : 'Objet modifié!'}))
+              .catch(error => res.status(401).json({ error }));
+          }
+      })
+      .catch((error) => {
+          res.status(400).json({ error });
+      });
 };
 
 // Suppression d’un objet
 exports.deleteThing = (req, res, next) => {
-    // Suppression d'un objet de la base de données par son ID
-    Thing.deleteOne({ _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Objet supprimé !' })) // Succès : objet supprimé
-      .catch(error => res.status(400).json({ error })); // Erreur : mauvaise requête
+  Thing.findOne({ _id: req.params.id})
+      .then(thing => {
+          if (thing.userId != req.auth.userId) {
+              res.status(401).json({message: 'Not authorized'});
+          } else {
+              const filename = thing.imageUrl.split('/images/')[1];
+              fs.unlink(`images/${filename}`, () => {
+                  Thing.deleteOne({_id: req.params.id})
+                      .then(() => { res.status(200).json({message: 'Objet supprimé !'})})
+                      .catch(error => res.status(401).json({ error }));
+              });
+          }
+      })
+      .catch( error => {
+          res.status(500).json({ error });
+      });
 };

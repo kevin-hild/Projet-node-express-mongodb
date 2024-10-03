@@ -3,7 +3,7 @@ const bodyParser = require('body-parser'); // body-parser : middleware pour pars
 const mongoose = require('mongoose'); // outil de gestion des documents MongoDB via des modèles
 const stuffRoutes = require('./routes/stuff');// importe le module (les routes pour stuff)
 const userRoutes = require('./routes/user'); // importe le module (les routes pour user)
- 
+const path = require('path');
 
 // Connexion à la base de données MongoDB hébergée via MongoDB Atlas
 mongoose.connect('mongodb+srv://dotadouze:t394QxMcrKcDeyII@cluster0.tyujc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
@@ -28,5 +28,6 @@ app.use(bodyParser.json());
 // indique à l'application Express d'utiliser ces routes à partir de l'URL /api/stuff
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes); 
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
