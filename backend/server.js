@@ -22,7 +22,7 @@ const normalizePort = val => {
 };
 
 // Détermination du port : utilisation du port défini dans les variables d'environnement, sinon 3000 par défaut
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '3000'); 
 app.set('port', port); // On configure l'application pour qu'elle écoute sur ce port
 
 // Gestionnaire d'erreurs pour le serveur
@@ -66,7 +66,7 @@ server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
-  console.log('Listening on ' + bind);
+  console.log('Listening on ' + bind); // Message indiquant que le serveur est en écoute sur le port spécifié
 });
 
 // Le serveur commence à écouter sur le port spécifié

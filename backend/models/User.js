@@ -6,11 +6,9 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 // Création d'un schéma Mongoose pour le modèle "User" (utilisateur)
 const userSchema = mongoose.Schema({
-  // Champ "email" : de type String, obligatoire, et unique (grâce au plugin uniqueValidator)
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },// Champ "email" : de type String, obligatoire, et unique (grâce au plugin uniqueValidator)
+  password: { type: String, required: true }// Champ "password" : de type String et obligatoire (mot de passe hashé)
 
-  // Champ "password" : de type String et obligatoire (mot de passe hashé)
-  password: { type: String, required: true }
 });
 
 // Application du plugin uniqueValidator au schéma pour s'assurer que l'email est unique

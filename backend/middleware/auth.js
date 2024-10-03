@@ -1,4 +1,4 @@
-// Importation du module jsonwebtoken pour la gestion des tokens JWT
+// Importation du module jsonwebtoken pour la gestion des tokens JWT (JSON Web Tokens)
 const jwt = require('jsonwebtoken');
 
 // Middleware d'authentification : vérifie que la requête contient un token valide
@@ -14,12 +14,12 @@ module.exports = (req, res, next) => {
         // Extraction de l'ID utilisateur depuis le token décodé
         const userId = decodedToken.userId;
 
-        // Ajout de l'ID utilisateur à l'objet 'req.auth' pour qu'il soit accessible dans les prochaines middlewares
+        // Ajout de l'ID utilisateur à l'objet 'req.auth' pour qu'il soit accessible dans les middlewares suivants
         req.auth = {
-            userId: userId
+            userId: userId // Associe l'ID utilisateur décodé au champ "auth" de la requête
         };
 
-        // Appel de la fonction next() pour passer à la suite du traitement de la requête
+        // Appel de la fonction next() pour passer au middleware ou route suivant
         next();
     } catch(error) {
         // En cas d'échec de vérification du token, on retourne une erreur 401 (non autorisé)
